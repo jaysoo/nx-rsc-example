@@ -1,72 +1,43 @@
 {
-  "name": "nx-rsc",
-  "$schema": "node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "./src",
+  "name": "server",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "server/src",
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/webpack:webpack",
+      "executor": "@nrwl/esbuild:esbuild",
       "outputs": [
         "{options.outputPath}"
       ],
       "defaultConfiguration": "production",
       "options": {
-        "compiler": "babel",
-        "outputPath": "dist/nx-rsc/browser",
-        "index": "src/index.html",
-        "baseHref": "/",
-        "main": "src/main.tsx",
+        "platform": "node",
+        "outputPath": "dist/server",
+        "format": [
+          "esm"
+        ],
+        "bundle": true,
+        "main": "server/src/main.ts",
         "tsConfig": "tsconfig.app.json",
-        "assets": [
-          "src/favicon.ico",
-          "src/assets"
-        ],
-        "styles": [
-          "src/styles.css"
-        ],
-        "scripts": [],
-        "isolatedConfig": true,
-        "webpackConfig": "webpack.config.js"
-      },
-      "configurations": {
-        "development": {
-          "extractLicenses": false,
-          "optimization": false,
-          "sourceMap": true,
-          "vendorChunk": true
-        },
-        "production": {
-          "fileReplacements": [
-            {
-              "replace": "src/environments/environment.ts",
-              "with": "src/environments/environment.prod.ts"
-            }
-          ],
-          "optimization": true,
-          "outputHashing": "all",
-          "sourceMap": false,
-          "namedChunks": false,
-          "extractLicenses": true,
-          "vendorChunk": false
-        }
-      }
-    },
-    "serve": {
-      "executor": "@nrwl/webpack:ssr-dev-server",
-      "defaultConfiguration": "development",
-      "options": {
-        "browserTarget": "nx-rsc:build:development",
-        "serverTarget": "nx-rsc:serve-server:development",
-        "port": 4200,
-        "browserTargetOptions": {
-          "watch": true
-        }
+        "esbuildConfig": "esbuild.config.js"
       },
       "configurations": {
         "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "server:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "server:build:development"
+        },
         "production": {
-          "browserTarget": "nx-rsc:build:production",
-          "serverTarget": "nx-rsc:serve-server:production"
+          "buildTarget": "server:build:production"
         }
       }
     },
@@ -77,87 +48,8 @@
       ],
       "options": {
         "lintFilePatterns": [
-          "./src/**/*.{ts,tsx,js,jsx}"
+          "server/**/*.ts"
         ]
-      }
-    },
-    "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectName}"
-      ],
-      "options": {
-        "jestConfig": "jest.config.ts",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
-      }
-    },
-    "server": {
-      "dependsOn": [
-        "build"
-      ],
-      "executor": "@nrwl/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
-      "defaultConfiguration": "production",
-      "options": {
-        "main": "./server/main.server.ts",
-        "outputPath": "dist/nx-rsc/server",
-        "tsConfig": "./tsconfig.server.json",
-      },
-      "configurations": {
-        "development": {
-          "optimization": false,
-          "sourceMap": true
-        },
-        "production": {
-          "fileReplacements": [
-            {
-              "replace": "./src/environments/environment.ts",
-              "with": "./src/environments/environment.prod.ts"
-            }
-          ],
-          "sourceMap": false
-        }
-      }
-    },
-    "serve-browser": {
-      "executor": "@nrwl/webpack:dev-server",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "nx-rsc:build",
-        "hmr": true
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "nx-rsc:build:development"
-        },
-        "production": {
-          "buildTarget": "nx-rsc:build:production",
-          "hmr": false
-        }
-      }
-    },
-    "serve-server": {
-      "executor": "@nrwl/js:node",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "nx-rsc:server:development",
-        "buildTargetOptions": {
-          "watch": true
-        }
-      },
-      "configurations": {
-        "development": {},
-        "production": {
-          "buildTarget": "nx-rsc:server:production"
-        }
       }
     }
   },
