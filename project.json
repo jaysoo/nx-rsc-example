@@ -30,6 +30,12 @@
         "development": {},
         "production": {}
       }
+    },
+    "serve": {
+      "dependsOn": [
+        "build"
+      ],
+      "command": "node dist/demo/server/main.mjs | npx pino-pretty"
     }
   },
   "tags": []

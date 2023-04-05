@@ -2,7 +2,9 @@
   "name": "acme",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start": "nx serve"
+  },
   "private": true,
   "dependencies": {
     "@fastify/autoload": "~5.7.1",
