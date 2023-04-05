@@ -1,0 +1,43 @@
+{
+  "name": "esbuild-plugin",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "esbuild-plugin/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/esbuild-plugin",
+        "main": "esbuild-plugin/src/index.ts",
+        "tsConfig": "esbuild-plugin/tsconfig.lib.json",
+        "assets": [
+          "esbuild-plugin/*.md",
+          {
+            "input": "./esbuild-plugin/src",
+            "glob": "**/!(*.ts)",
+            "output": "./src"
+          },
+          {
+            "input": "./esbuild-plugin/src",
+            "glob": "**/*.d.ts",
+            "output": "./src"
+          },
+          {
+            "input": "./esbuild-plugin",
+            "glob": "generators.json",
+            "output": "."
+          },
+          {
+            "input": "./esbuild-plugin",
+            "glob": "executors.json",
+            "output": "."
+          }
+        ]
+      }
+    }
+  },
+  "tags": []
+}

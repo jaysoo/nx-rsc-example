@@ -11,7 +11,12 @@
     "strict": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@acme/esbuild-plugin": [
+        "esbuild-plugin/src/index.ts"
+      ]
+    }
   },
   "references": [
     {
