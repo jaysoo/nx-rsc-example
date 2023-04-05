@@ -1,12 +1,8 @@
 {
-  "name": "nx-rsc",
+  "name": "acme",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {
-    "start": "nx serve",
-    "build": "nx build",
-    "test": "nx test"
-  },
+  "scripts": {},
   "private": true,
   "dependencies": {
     "@fastify/autoload": "~5.7.1",

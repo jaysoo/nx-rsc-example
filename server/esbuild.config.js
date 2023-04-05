@@ -36,6 +36,7 @@ const USE_CLIENT_ANNOTATIONS = ['"use client"', "'use client'"];
 const relativeOrAbsolutePathRegex = /^\.{0,2}\//;
 
 module.exports = {
+  packages: 'external',
   plugins: [
     {
       name: 'resolve-client-imports',

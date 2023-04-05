@@ -6,7 +6,6 @@ import { Readable } from 'stream';
 import * as ReactServerDom from 'react-server-dom-webpack/server.browser';
 import * as React from 'react';
 
-import { ServerRoot } from './app/server-root';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3000;
@@ -18,22 +17,30 @@ const server = Fastify({
 
 // Register your application as a normal plugin.
 server.get('/rsc', async function(request, reply) {
+  const ServerRoot = await import(new URL('../app/page.mjs', import.meta.url).href);
   // @ts-ignore
-  const Page = React.createElement(ServerRoot, {});
-  console.log({ Page });
+  const Page = React.createElement(ServerRoot.default, {});
   const clientComponentMap = {};
   const webStream = ReactServerDom.renderToReadableStream(Page, clientComponentMap);
   const nodeStream = Readable.fromWeb(webStream);
-  console.log('stream?', nodeStream.pipe);
   reply.type('text/x-component');
   await reply.send(nodeStream);
 });
 
 server.get('/', async (request, reply) => {
-  const html = fs.readFileSync(path.join(__dirname, 'index.html'));
-  reply.send(html);
+  const html = await fs.promises.readFile(
+    new URL('../../client/index.html', import.meta.url),
+    'utf-8'
+  );
+  reply.type('text/html');
+  await reply.send(html);
 });
 
+server.get('/assets/:file(.+).js', async (request, reply) => {
+  const contents = await fs.promises.readFile(new URL('../../client/' + request.url, import.meta.url), 'utf-8');
+  reply.type('application/javascript');
+  await reply.send(contents);
+});
 
 // Start listening.
 server.listen({ port, host }, (err) => {

@@ -79,5 +79,5 @@
       }
     }
   },
-  "defaultProject": "server"
+  "defaultProject": "app"
 }

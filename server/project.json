@@ -1,0 +1,34 @@
+{
+  "name": "server",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "server/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/esbuild:esbuild",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "defaultConfiguration": "production",
+      "options": {
+        "platform": "node",
+        "outputPath": "dist/server",
+        "format": [
+          "esm"
+        ],
+        "bundle": true,
+        "main": "server/main.ts",
+        "additionalEntryPoints": [
+          "app/page.tsx"
+        ],
+        "tsConfig": "server/tsconfig.app.json",
+        "esbuildConfig": "server/esbuild.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    }
+  },
+  "tags": []
+}
