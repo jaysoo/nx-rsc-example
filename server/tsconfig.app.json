@@ -1,13 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "outDir": "../dist/out-tsc",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "types": [
-      "node"
-    ]
-  },
   "exclude": [
     "jest.config.ts",
     "src/**/*.spec.ts",

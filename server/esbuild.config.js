@@ -1,29 +1,18 @@
 const path = require('path');
+const esbuild = require('esbuild');
 const fs = require('fs');
 
-const src = path.join(__dirname, './server/src/app');
-const dist = path.join(__dirname, './dist/server');
-
-console.log({ src, dist })
-function resolveSrc(s) {
-  return path.join(src, s);
-}
+const workspaceRoot = path.join(__dirname, '..');
+const dist = path.join(workspaceRoot, 'dist/app/server');
 
 function resolveDist(s) {
   return path.join(dist, s);
 }
 
-function resolveClientDist(s) {
-  return path.join(resolveDist('client'), s);
-}
-
-function resolveServerDist(s) {
-  return path.join(resolveDist('server', s));
-}
-
 const clientComponentMapUrl = resolveDist('clientComponentMap.json');
 
 async function writeClientComponentMap(bundleMap) {
+  console.log({ clientComponentMapUrl, bundleMap });
   await fs.promises.writeFile(clientComponentMapUrl, JSON.stringify(bundleMap));
 }
 
@@ -41,55 +30,80 @@ module.exports = {
     {
       name: 'resolve-client-imports',
       setup(build) {
-        console.log('setting up plugin')
         const clientComponentMap = {};
         const clientEntryPoints = new Set();
         // Intercept component imports to find client entry points
-        build.onResolve({ filter: relativeOrAbsolutePathRegex }, async ({ path }) => {
-          // Note: assumes file extension is omitted
-          // i.e. import paths are './Component', not './Component.jsx'
-          const absoluteSrc = resolveSrc(path) + '.tsx';
+        build.onResolve(
+          { filter: relativeOrAbsolutePathRegex },
+          async (ctx) => {
+            const absoluteSrc = path.join(ctx.resolveDir, ctx.path) + '.tsx';
 
-          if (fs.existsSync(absoluteSrc)) {
-            console.log('writing client component', absoluteSrc);
-            // Check for `"use client"` annotation. Short circuit if not found.
-            const contents = await fs.promises.readFile(absoluteSrc, 'utf-8');
-            if (!USE_CLIENT_ANNOTATIONS.some((annotation) => contents.startsWith(annotation)))
-              return;
+            if (fs.existsSync(absoluteSrc)) {
+              // Check for `"use client"` annotation. Short circuit if not found.
+              const contents = await fs.promises.readFile(absoluteSrc, 'utf-8');
+              if (
+                !USE_CLIENT_ANNOTATIONS.some((annotation) =>
+                  contents.startsWith(annotation)
+                )
+              )
+                return;
 
-            clientEntryPoints.add(absoluteSrc);
-            const absoluteDist = resolveClientDist(path) + '.mjs';
-            console.log({ absoluteDist })
+              clientEntryPoints.add(absoluteSrc);
+              const relativeSrc = path
+                .relative(workspaceRoot, absoluteSrc)
+                .replace(/^app\//, 'client/');
+              const absoluteDist = path
+                .join(workspaceRoot, 'dist/app', relativeSrc)
+                .replace(/\.tsx$/, '.mjs');
 
-            // Path the browser will import this client-side component from.
-            // This will be fulfilled by the server router.
-            // @see './index.js'
-            const id = `/dist/client/${path}.mjs`;
+              const id = `/${relativeSrc.replace(/\.tsx$/, '.mjs')}`;
 
-            clientComponentMap[id] = {
-              id,
-              chunks: [],
-              name: 'default', // TODO support named exports
-              async: true
-            };
+              clientComponentMap[id] = {
+                id,
+                chunks: [],
+                name: 'default', // TODO support named exports
+                async: true,
+              };
 
-            return {
-              // Encode the client component module in the import URL.
-              // This is a... wacky solution to avoid import middleware.
-              path: `data:text/javascript,${encodeURIComponent(
-                getClientComponentModule(id, `file://${absoluteDist}`)
-              )}`,
-              external: true
-            };
+              const rsc = getClientComponentModule(
+                id,
+                `file://${absoluteDist}`
+              );
+              console.log({ absoluteDist, id, rsc });
+              return {
+                // Encode the client component module in the import URL.
+                // This is a... wacky solution to avoid import middleware.
+                path: `data:text/javascript,${encodeURIComponent(rsc)}`,
+                external: true,
+              };
+            }
           }
+        );
 
+        build.onEnd(async (result) => {
+          console.log(`server build ended with ${result.errors.length} errors`);
+
+          await esbuild.build({
+            tsconfig: 'server/tsconfig.app.json',
+            bundle: true,
+            format: 'esm',
+            entryPoints: [
+              ...clientEntryPoints,
+              path.join(workspaceRoot, 'app/router.tsx'),
+            ],
+            outdir: path.join(workspaceRoot, 'dist/app/client'),
+            splitting: true,
+            outExtension: {
+              '.js': '.mjs',
+            },
+          });
+
+          console.log('client build done');
+
+          await writeClientComponentMap(clientComponentMap);
         });
-        build.onEnd((result) => {
-          console.log(`build ended with ${result.errors.length} errors`);
-          writeClientComponentMap(clientComponentMap);
-        })
-      }
-    }
+      },
+    },
   ],
   outExtension: {
     '.js': '.mjs',

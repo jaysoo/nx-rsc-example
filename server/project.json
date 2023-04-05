@@ -12,7 +12,7 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/server",
+        "outputPath": "dist/app",
         "format": [
           "esm"
         ],
@@ -20,6 +20,9 @@
         "main": "server/main.ts",
         "additionalEntryPoints": [
           "app/page.tsx"
+        ],
+        "assets": [
+          "server/index.html"
         ],
         "tsConfig": "server/tsconfig.app.json",
         "esbuildConfig": "server/esbuild.config.js"

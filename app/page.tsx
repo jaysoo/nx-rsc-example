@@ -1,9 +1,5 @@
-import { Suspense } from 'react';
+import Foo from './foo';
 
 export default async function ServerRoot() {
-  return (
-    <>
-      <h1>Demo</h1>
-    </>
-  );
+  return <Foo />;
 }
