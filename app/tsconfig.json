@@ -4,7 +4,11 @@
     "allowJs": false,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
-    "strict": false
+    "strict": true,
+    "types": [
+      "vite/client",
+      "vitest"
+    ]
   },
   "files": [],
   "include": [],
@@ -13,5 +17,5 @@
       "path": "./tsconfig.app.json"
     }
   ],
-  "extends": "./tsconfig.base.json"
+  "extends": "../tsconfig.base.json"
 }
