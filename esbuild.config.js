@@ -2,8 +2,8 @@ const path = require('path');
 const esbuild = require('esbuild');
 const fs = require('fs');
 
-const workspaceRoot = path.join(__dirname, '..');
-const dist = path.join(workspaceRoot, 'dist/app/server');
+const workspaceRoot = path.join(__dirname, '.');
+const dist = path.join(workspaceRoot, 'dist/demo/server');
 
 function resolveDist(s) {
   return path.join(dist, s);
@@ -53,7 +53,7 @@ module.exports = {
                 .relative(workspaceRoot, absoluteSrc)
                 .replace(/^app\//, 'client/');
               const absoluteDist = path
-                .join(workspaceRoot, 'dist/app', relativeSrc)
+                .join(workspaceRoot, 'dist/demo', relativeSrc)
                 .replace(/\.tsx$/, '.mjs');
 
               const id = `/${relativeSrc.replace(/\.tsx$/, '.mjs')}`;
@@ -84,14 +84,14 @@ module.exports = {
           console.log(`server build ended with ${result.errors.length} errors`);
 
           await esbuild.build({
-            tsconfig: 'server/tsconfig.app.json',
+            tsconfig: 'tsconfig.app.json',
             bundle: true,
             format: 'esm',
             entryPoints: [
               ...clientEntryPoints,
               path.join(workspaceRoot, 'app/router.tsx'),
             ],
-            outdir: path.join(workspaceRoot, 'dist/app/client'),
+            outdir: path.join(workspaceRoot, 'dist/demo/client'),
             splitting: true,
             outExtension: {
               '.js': '.mjs',

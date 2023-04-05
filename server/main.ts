@@ -16,7 +16,7 @@ const server = Fastify({
 });
 
 // Register your application as a normal plugin.
-server.get('/rsc', async function (request, reply) {
+server.get('/rsc', async function(request, reply) {
   console.log('import.meta.url', import.meta.url);
   const url = new URL('../app/page.mjs', import.meta.url);
   const ServerRoot = await import(url.href);
@@ -38,7 +38,7 @@ server.get('/rsc', async function (request, reply) {
 
 server.get('/', async (request, reply) => {
   const html = await fs.promises.readFile(
-    new URL('../index.html', import.meta.url),
+    new URL('./index.html', import.meta.url),
     'utf-8'
   );
   reply.type('text/html');

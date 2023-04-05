@@ -1,7 +1,6 @@
 {
-  "name": "server",
+  "name": "demo",
   "$schema": "../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "server/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -12,7 +11,7 @@
       "defaultConfiguration": "production",
       "options": {
         "platform": "node",
-        "outputPath": "dist/app",
+        "outputPath": "dist/demo",
         "format": [
           "esm"
         ],
@@ -24,8 +23,8 @@
         "assets": [
           "server/index.html"
         ],
-        "tsConfig": "server/tsconfig.app.json",
-        "esbuildConfig": "server/esbuild.config.js"
+        "tsConfig": "tsconfig.app.json",
+        "esbuildConfig": "esbuild.config.js"
       },
       "configurations": {
         "development": {},
